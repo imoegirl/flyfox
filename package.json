@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node ./foxcore/main.mjs"
+    "start": "node ./foxcore/foxcore.mjs"
   },
   "author": "",
   "license": "ISC",
