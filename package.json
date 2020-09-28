@@ -4,11 +4,12 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node ./foxcore/foxcore.mjs"
+    "start": "node ./main.mjs"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "log4js": "^6.3.0"
+    "log4js": "^6.3.0",
+    "mongoose": "^5.10.7"
   }
 }

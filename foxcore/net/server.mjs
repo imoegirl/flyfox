@@ -1,5 +1,4 @@
 import net from "net";
-import MsgHandler from "./netbridge.mjs";
 
 class Session {
   constructor(id, socket){
@@ -9,29 +8,44 @@ class Session {
 }
 
 class Server {
-  constructor(port) {
-    this.port = port;
+  constructor() {
     this.sessions = new Map();
     this.idIndex = 100000000;
   }
 
-  StartServer(){
+  StartServer(port, okCallback, errCallback){
+    this.port = port;
+    this.okCallback = okCallback;
+    this.errCallback = errCallback;
+
     let tServer = this;
     let sSocket = net.createServer(function(socket){
       tServer.OnConnectionMade(socket);
     });
+
+    sSocket.on("error", (e)=>{
+      tServer.OnServerError(e);
+    });
+
     sSocket.listen(this.port, function(){
       tServer.OnServerStarted();
     })
   }
 
   OnServerStarted(){
-    netLogger.info("On Server Started, Port: ", this.port);
+    global.netLogger.info("On Server Started, Port: ", this.port);
+    this.okCallback();
+  }
+
+  OnServerError(e){
+    global.netLogger.error("On Server Error, e.code: ", e.code);
+    this.errCallback();
   }
 
   OnConnectionMade(connection){
     let sessionId = this.idIndex;
     this.idIndex += 1;
+    global.netLogger.info("New client connected! assign id: ", sessionId);
     connection.id = sessionId;
     let session = new Session(sessionId, connection);
     this.sessions.set(sessionId, session);
@@ -39,15 +53,18 @@ class Server {
     let tServer = this;
 
     connection.on("data", function(data) {
+      global.netLogger.info("Received Data From ", session.id, "Data:\n", data);
       global.netBridge.HandleConnectionData(session, data);
     });
 
     connection.on("close", function() {
+      global.netLogger.info("On Session Closed, id: ", session.id);
       tServer.RemoveSession(session.id);
       global.netBridge.HandleConnectionClose(session.id);
     });
 
     connection.on("error", function(){
+      global.netLogger.error("On Session Error, id: ", session.id);
       tServer.RemoveSession(session.id);
       global.netBridge.HandleConnectionError(session.id);
     });
@@ -64,6 +81,7 @@ class Server {
   RemoveSession(id){
     if(this.sessions.delete(id)){
       // delete successful
+      global.netLogger.info("Session Removed, id: ", id);
     }
   }
 
@@ -80,9 +98,10 @@ class Server {
   Send(id, bytes) {
     let session = this.GetSession(id);
     if (session != undefined) {
+      global.netLogger.info("Send Data to Session ", id, "Data: \n", bytes);
       session.socket.write(bytes);
     }else{
-      global.netLogger.info("数据发送失败，找不到Session，ID: ", id);
+      global.global.netLogger.info("数据发送失败，找不到Session，ID: ", id);
     }
   }
 }

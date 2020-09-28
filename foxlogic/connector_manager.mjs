@@ -31,3 +31,5 @@ class ConnectorManager {
     }
   }
 }
+
+export default ConnectorManager;

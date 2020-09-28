@@ -17,7 +17,7 @@ global.foxUtil = foxUtil;
 
 
 // -------- Module Msg Handler --------
-const netBridge = new MsgHandler();
+const netBridge = new NetBridge();
 global.netBridge = netBridge;
 
 
@@ -27,7 +27,15 @@ global.dbAgent = dbAgent;
 
 
 // -------- Module Server --------
-const server = new Server(9999);
+const server = new Server();
 global.server = server;
 // server.StartServer();
 
+
+global.foxCore = {
+    "netBridge": netBridge,
+    "dbAgent": dbAgent,
+    "server": server,
+}
+
+export default null;
