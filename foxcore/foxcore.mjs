@@ -9,6 +9,7 @@ const log = new Log("./Logs/Main");
 global.logger = log.common;
 global.netLogger = log.net;
 global.dbLogger = log.db;
+global.packageLogger = log.package;
 
 
 // -------- Module Util --------
@@ -36,6 +37,7 @@ global.foxCore = {
     "netBridge": netBridge,
     "dbAgent": dbAgent,
     "server": server,
+    "foxUtil": foxUtil,
 }
 
 export default null;

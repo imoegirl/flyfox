@@ -4,6 +4,7 @@ class Session {
   constructor(id, socket){
     this.id = id;
     this.socket = socket;
+    this.lastMsgTimestamp = -1;
   }
 }
 
@@ -54,6 +55,7 @@ class Server {
 
     connection.on("data", function(data) {
       global.netLogger.info("Received Data From ", session.id, "Data:\n", data);
+      session.lastMsgTimestamp = Math.floor(Date.now() / 1000);
       global.netBridge.HandleConnectionData(session, data);
     });
 
@@ -82,6 +84,14 @@ class Server {
     if(this.sessions.delete(id)){
       // delete successful
       global.netLogger.info("Session Removed, id: ", id);
+    }
+  }
+
+  ShutdownSession(id){
+    let session = this.GetSession(id);
+    global.netLogger.info("ShutdownSession, id: ", id);
+    if (session != undefined) {
+      session.socket.destroy();
     }
   }
 

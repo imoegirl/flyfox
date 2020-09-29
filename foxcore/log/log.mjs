@@ -16,6 +16,7 @@ class Log {
       this.common = log4js.getLogger("Common");
       this.net = log4js.getLogger("Net");
       this.db = log4js.getLogger("DB");
+      this.package = log4js.getLogger("Package");
     }
 }
 

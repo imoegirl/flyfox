@@ -6,6 +6,7 @@ class Connector {
   Init(addr, devicesAddrArray) {
     this.addr = addr;
     this.devicesAddrArray = devicesAddrArray;
+    this.hexAddrStr = `0x${this.addr.toString(16)}`;
   }
 }
 
@@ -29,6 +30,10 @@ class ConnectorManager {
     }else{
         global.logger.info("Connector does not exists: ", socketId);
     }
+  }
+
+  GetConnector(id){
+    return this.connectorMap.get(id);
   }
 }
 
