@@ -6,15 +6,15 @@ class NetBridge {
   }
 
   HandleConnectionData(session, data){
-
+    global.foxLogic.packageHandler.HandlePackage(session.id, data);
   }
 
   HandleConnectionClose(id){
-
+    global.foxLogic.connMgr.RemoveConnector(id);
   }
 
   HandleConnectionError(id){
-
+    global.foxLogic.connMgr.RemoveConnector(id);
   }
 
   SendData(id, bytes) {

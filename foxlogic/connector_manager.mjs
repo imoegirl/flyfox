@@ -1,6 +1,6 @@
 class Connector {
-  construct(socketId) {
-    this.socketId = socketId;
+  construct(sessionId) {
+    this.sessionId = sessionId;
   }
 
   Init(addr, devicesAddrArray) {
@@ -15,20 +15,23 @@ class ConnectorManager {
     this.connectorMap = new Map();
   }
 
-  AddConnector(socketId, addr, devicesAddrArray) {
-    let connector = this.connectorMap.get(socketId);
+  AddConnector(sessionId, addr, devicesAddrArray) {
+    let connector = this.connectorMap.get(sessionId);
     if (connector == undefined) {
-      connector = new Connector(socketId);
+      connector = new Connector(sessionId);
     }
     connector.Init(addr, devicesAddrArray);
+
+    // todo: send event refresh view
   }
 
-  RemoveConnector(socketId) {
-    let connector = this.connectorMap.get(socketId);
-    if (this.connectorMap.delete(socketId)) {
+  RemoveConnector(sessionId) {
+    let connector = this.connectorMap.get(sessionId);
+    if (this.connectorMap.delete(sessionId)) {
       global.logger.info("Connector Deleted: ", connector.socketId, connector.addr);
+      // todo: send event refresh view
     }else{
-        global.logger.info("Connector does not exists: ", socketId);
+        // global.logger.info("Connector does not exists: ", socketId);
     }
   }
 
