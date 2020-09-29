@@ -38,6 +38,18 @@ class FoxUtil {
     var sec = parseInt(bcdDateList[5].toString(16));
     return [year, month, day, hour, min, sec];
   }
+
+  CalculateLRC(buffer, start, end){
+    let lrc = 0
+    for (var i = start; i <= end; ++i) {
+      lrc += buffer[i]
+    }
+
+    lrc = lrc % 256
+    lrc = 256 - lrc
+    lrc = lrc % 256
+    return lrc
+  }
 }
 
 export default FoxUtil;
