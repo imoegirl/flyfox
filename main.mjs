@@ -1,5 +1,7 @@
 import "./foxcore/foxcore.mjs";
 import "./foxlogic/foxlogic.mjs";
+import "./foxlogic/packages/packages.mjs"
+import { SCOnlinePackage } from "./foxlogic/packages/packages.mjs";
 
 global.logger.info("All Started");
 
@@ -33,22 +35,10 @@ function StartServer() {
 
 // ConnectDB();
 
-class A {
-  constructor(){
-    this.PackageType = 0x00;
-  }
+let strAddr4G = "010000000001";
+let onlinePackage = new SCOnlinePackage();
+onlinePackage.FillData(strAddr4G);
 
-  ShowInfo(){
-    console.log("Type: ", this.PackageType.toString(16));
-  }
-}
+let bytes = onlinePackage.FinishPackage();
 
-class B extends A{
-  constructor(){
-    super();
-    this.PackageType = 0xC9;
-  }
-}
-
-let b = new B();
-b.ShowInfo();
+global.logger.info(bytes);
