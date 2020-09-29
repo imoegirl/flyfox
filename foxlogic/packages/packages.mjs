@@ -128,9 +128,10 @@ class SCPackage extends BasePackage {
     offset += 1;
     logger.info(finalBuffer, totalPackageLength);
     
-    finalBuffer.fill(finalUserDataBuffer, offset, finalUserDataBuffer.length);
+    finalBuffer.fill(finalUserDataBuffer, offset, );
+    offset += finalUserDataBuffer.length;
     let lrc = global.foxCore.foxUtil.CalculateLRC(finalBuffer, 0, finalBuffer.length - 1);
-    finalBuffer.writeUInt8(lrc);
+    finalBuffer.writeUInt8(lrc, );
     return finalBuffer;
   }
 }
