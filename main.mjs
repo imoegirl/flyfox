@@ -32,3 +32,23 @@ function StartServer() {
 }
 
 // ConnectDB();
+
+class A {
+  constructor(){
+    this.PackageType = 0x00;
+  }
+
+  ShowInfo(){
+    console.log("Type: ", this.PackageType.toString(16));
+  }
+}
+
+class B extends A{
+  constructor(){
+    super();
+    this.PackageType = 0xC9;
+  }
+}
+
+let b = new B();
+b.ShowInfo();

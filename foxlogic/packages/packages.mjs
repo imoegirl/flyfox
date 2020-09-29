@@ -16,7 +16,7 @@ class BasePackage {
 
   writeUInt16(value) {
     let buffer = Buffer.alloc(2);
-    buffer.writeUInt16LE(value, 0);
+    buffer.writeUInt16BE(value, 0);
     this.userDataBufferArray.push(buffer);
     this.userDataLength += 2;
   }
@@ -40,6 +40,11 @@ class BasePackage {
     this.userDataLength += buffer.length;
   }
 
+  writeBuffer(buf){
+    this.userDataBufferArray.push(buf);
+    this.userDataLength += buf.length;
+  }
+
   readUInt8() {
     var value = this.rawBuffer.readUInt8(this.readOffset);
     this.readOffset += 1;
@@ -47,7 +52,7 @@ class BasePackage {
   }
 
   readUInt16() {
-    var value = this.rawBuffer.readUInt16LE(this.readOffset);
+    var value = this.rawBuffer.readUInt16BE(this.readOffset);
     this.readOffset += 2;
     return value;
   }
@@ -92,26 +97,64 @@ class BasePackage {
   }
 }
 
+// 00000012 68 0012 0012 68 c9 010000000001 2f
+// 00000012 68 0012 0012 68 C6 010000000001 32
+// 0000001e 68 001e 001e 68 01 010000000001 fe ffff 00 31 06 21 22 23 24 2552 cd
+// Custom user data write from 4G address
 class SCPackage extends BasePackage {
   constructor() {
     super(null);
-    this.staticHeaderLength = 5;
+    this.staticHeaderLength = 18;
+    this.PackageType = 0x00;
   }
 
   FinishPackage() {
     let totalPackageLength = this.staticHeaderLength + this.userDataLength;
     let finalUserDataBuffer = Buffer.concat(this.userDataBufferArray);
     let finalBuffer = Buffer.alloc(totalPackageLength);
+    finalBuffer.writeUInt32BE(totalPackageLength);
     finalBuffer.writeUInt8(0x68);
-    finalBuffer.writeUInt8(totalPackageLength);
-    finalBuffer.writeUInt8(totalPackageLength);
+    finalBuffer.writeUInt16BE(totalPackageLength);
+    finalBuffer.writeUInt16BE(totalPackageLength);
     finalBuffer.writeUInt8(0x68);
-    finalBuffer.fill(finalUserDataBuffer, 4, finalUserDataBuffer.length);
+    finalBuffer.writeUInt8(this.PackageType);
+
+    finalBuffer.fill(finalUserDataBuffer, this.staticHeaderLength - 1, finalUserDataBuffer.length);
     let lrc = global.foxCore.foxUtil.CalculateLRC(finalBuffer, 0, finalBuffer.length - 1);
     finalBuffer.writeUInt8(lrc);
     return finalBuffer;
   }
 }
+
+
+class SCOnlinePackage extends SCPackage {
+  constructor(){
+    super();
+    this.PackageType = 0xC9;
+  }
+
+  FillData(addrStr4G){
+    let addr4GBuf = Buffer.from(addrStr4G, "hex");
+    this.writeBuffer(addr4GBuf);
+  }
+}
+
+
+class SCHeartBeatPackage extends SCPackage{
+  constructor(){
+    super();
+    this.PackageType = 0xC6;
+  }
+
+  FillData(addrStr4G){
+    let addr4GBuf = Buffer.from(addrStr4G, "hex");
+    this.writeBuffer(addr4GBuf);
+  }
+}
+
+
+
+
 
 class CSPackage extends BasePackage {
   constructor(rawData) {
