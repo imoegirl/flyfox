@@ -1,3 +1,24 @@
+const SC_MODBUS_SYMBOL = 0xfe;
+const SC_STATIC_ADDR16 = 0xffff;
+const SC_STATIC_DEVICE_TYPE = 0x00;
+
+/*
+  BasePackage 定义了基础的Buffer写入与读取功能
+  SCPackage 定义了包头所需要的固定数据，
+    包头长度: [i32_数据包长度，i8_固定0x68，i16_数据包长度，i16_数据包长度，i8_固定0x68，i8_包类型，i8_LRC]
+    包类型(上机，心跳，Modbus) i8
+    4G地址 (6 Bytes)
+    SCPackage会在来构造时，将4G地址自动写入用户数据
+
+  SCModbusPackage 定义了通用的数据类型包
+    SCModbusPackage 在构造时将自动写入 包头固定数据，CMD
+
+  具体的数据包需要调用FillData，填充自己的数据
+
+  包结束时，调用FinishPackage，会得到整个包的bytes，将此通过网络发出
+*/
+
+
 class BasePackage {
   constructor(rawBuffer) {
     this.userDataBufferArray = [];
@@ -102,10 +123,14 @@ class BasePackage {
 // 0000001e 68 001e 001e 68 01 | 010000000001 fe ffff 00 31 06 21 22 23 24 2552 cd
 // Custom user data write from 4G address
 class SCPackage extends BasePackage {
-  constructor() {
+  constructor(strAddr4G) {
     super(null);
     this.staticHeaderLength = 12;
     this.PackageType = 0x00;
+    this.strAddr4G = strAddr4G;
+
+    let addr4GBuf = Buffer.from(strAddr4G, "hex");
+    this.writeBuffer(addr4GBuf);
   }
 
   FinishPackage() {
@@ -130,37 +155,107 @@ class SCPackage extends BasePackage {
     
     finalBuffer.fill(finalUserDataBuffer, offset, );
     offset += finalUserDataBuffer.length;
-    let lrc = global.foxCore.foxUtil.CalculateLRC(finalBuffer, 0, finalBuffer.length - 1);
-    finalBuffer.writeUInt8(lrc, );
+    // 计算LRC，从整个包的第一个字节，到倒数第2个字节，因为索引是从0开始的，所以是length - 2
+    let lrc = global.foxCore.foxUtil.CalculateLRC(finalBuffer, 0, finalBuffer.length - 2);
+    finalBuffer.writeUInt8(lrc, offset);
     return finalBuffer;
   }
 }
 
+// 服务器->客户端，回复上线
 class SCOnlinePackage extends SCPackage {
-  constructor() {
-    super();
+  constructor(strAddr4G) {
+    super(strAddr4G);
     this.PackageType = 0xc9;
-  }
-
-  FillData(addrStr4G) {
-    let addr4GBuf = Buffer.from(addrStr4G, "hex");
-    this.writeBuffer(addr4GBuf);
   }
 }
 
+// 服务器->客户端，回复心跳
 class SCHeartBeatPackage extends SCPackage {
   constructor() {
     super();
     this.PackageType = 0xc6;
   }
+}
 
-  FillData(addrStr4G) {
-    let addr4GBuf = Buffer.from(addrStr4G, "hex");
-    this.writeBuffer(addr4GBuf);
+// 基础通用协议包
+class SCModbusPackage extends SCPackage {
+  constructor(strAddr4G, cmd){
+    super(strAddr4G);
+    this.PackageType = 0x01;
+    this.CMD = cmd;
+
+    this.writeUInt8(SC_MODBUS_SYMBOL);
+    this.writeUInt16(SC_STATIC_ADDR16);
+    this.writeUInt8(SC_STATIC_DEVICE_TYPE);
+    this.writeUInt8(this.CMD);
   }
 }
 
-export { SCOnlinePackage, SCHeartBeatPackage };
+// 3. 修改4G模块IP服务器地(1：4G模块参数设置)
+class SCSet4GIPAndPortPackage extends SCModbusPackage {
+  constructor(strAddr4G){
+    super(strAddr4G, 0x31);
+  }
+
+  FillData(i8_ip1, i8_ip2, i8_ip3, i8_ip4, i16_port) {
+    let dataLength = 6;
+    this.writeUInt8(dataLength);
+    this.writeUInt8(i8_ip1);
+    this.writeUInt8(i8_ip2);
+    this.writeUInt8(i8_ip3);
+    this.writeUInt8(i8_ip4);
+    this.writeUInt16(i16_port);
+  }
+}
+
+// 5. 设置手机号
+class SCSetPhoneNumber extends SCModbusPackage {
+  constructor(strAddr4G){
+    super(strAddr4G, 0x42);
+  }
+
+  FillData(i8_phoneIndex, strPhoneNumber, i8_sendMsg){
+    let dataLength = 16;
+    this.writeUInt8(dataLength);
+    this.writeUInt8(i8_phoneIndex);
+    let phoneBuf = Buffer.from(strPhoneNumber.split(""), "hex");
+    this.writeBuffer(phoneBuf);
+    this.writeUInt8(i8_sendMsg);
+    this.writeBuffer(Buffer.from([0,0,0])); // 保留位
+  }
+}
+
+// 6. 获取手机号
+class SCGetPhoneNumber extends SCModbusPackage {
+  constructor(strAddr4G){
+    super(strAddr4G, 0x43);
+  }
+
+  FillData(i8_phoneIndex){
+    let dataLength = 1;
+    this.writeUInt8(dataLength); // datalength
+    this.writeUInt8(i8_phoneIndex);
+  }
+}
+
+// 7. 发送统计数量
+class SCSendStatisticalData extends SCModbusPackage {
+  constructor(strAddr4G){
+    super(strAddr4G, 0x44);
+  }
+
+  FillData(i16_loudian, i16_dianliu, i16_wendu){
+    let dataLength = 16;
+    this.writeUInt8(dataLength);
+    this.writeUInt16(i16_loudian);
+    this.writeUInt16(i16_dianliu);
+    this.writeUInt16(i16_wendu);
+    this.writeBuffer(Buffer.from([0,0,0,0,0,0,0,0,0,0])); // 10个字节保留
+  }
+}
+
+export { SCOnlinePackage, SCHeartBeatPackage, SCSet4GIPAndPortPackage };
 
 // class CSPackage extends BasePackage {
 //   constructor(rawData) {
