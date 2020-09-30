@@ -255,6 +255,28 @@ class SCSendStatisticalData extends SCModbusPackage {
   }
 }
 
+
+class SCSetMsgContent extends SCModbusPackage {
+  constructor(strAddr4G){
+    super(strAddr4G, 0x45);
+  }
+
+  FillData(msgContent){
+    let dataLength = 32;
+    this.writeUInt8(dataLength);
+    let msgBuffer = Buffer.from(msgContent);
+    this.writeBuffer(msgBuffer);
+    
+    // 如果要填充数据，
+    let fillLen = dataLength - msgBuffer.length;
+    if(fillLen > 0){
+      let zeroArray = new Array(fillLen).fill(0);
+      let fillBuffer = Buffer.from(zeroArray);
+      this.writeBuffer(fillBuffer);
+    }
+  }
+}
+
 export { SCOnlinePackage, SCHeartBeatPackage, SCSet4GIPAndPortPackage };
 
 // class CSPackage extends BasePackage {

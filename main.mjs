@@ -1,6 +1,6 @@
 import "./foxcore/foxcore.mjs";
 import "./foxlogic/foxlogic.mjs";
-import "./foxlogic/packages/packages.mjs"
+import "./foxlogic/packages/packages.mjs";
 import { SCSet4GIPAndPortPackage } from "./foxlogic/packages/packages.mjs";
 import { SCHeartBeatPackage } from "./foxlogic/packages/packages.mjs";
 import { SCOnlinePackage } from "./foxlogic/packages/packages.mjs";
