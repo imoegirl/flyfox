@@ -1,0 +1,33 @@
+const CMD = {
+  SCSet4GIPAndPort: 0x31,
+  SCSetPhoneNumber: 0x42,
+  SCGetPhoneNumber: 0x43,
+  SCSendStatisticalData: 0x44,
+  SCSetMsgContent: 0x45,
+  SCGetMsgContent: 0x46,
+  SCGetDomainAndPort: 0x47,
+  SCSetDomainAndPort: 0x4a,
+  SCGetAPN: 0x4b,
+  SCSetAPN: 0x4c,
+  SCGetConnectionType: 0x71,
+  SCSetConnectionType: 0x72,
+  SCGetSimUseramePassword: 0x73,
+  SCSetSimUsernamePassword: 0x74,
+
+  CSSet4GIPAndPort: 0xd1,
+  CSSetPhoneNumber: 0xc2,
+  CSGetPhoneNumber: 0xc3,
+  CSSendStatisticaData: 0xc4,
+  CSSetMsgContent: 0xc5,
+  CSGetMsgContent: 0xc7,
+  CSGetDomainAndPort: 0xc8,
+  CSSetDomainAndPort: 0xca,
+  CSGetAPN: 0xcb,
+  CSSetAPN: 0xcc,
+  CSGetConnectionType: 0x91,
+  CSSetConnectionType: 0x92,
+  CSGetSimUseramePassword: 0x93,
+  CSSetSimUsernamePassword: 0x94,
+};
+
+export default CMD;
