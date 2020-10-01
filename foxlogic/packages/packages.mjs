@@ -209,10 +209,10 @@ class SCModbusPackage extends SCPackage {
 class SCSet4GIPAndPort extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSet4GIPAndPort);
+    this.FillDeviceInfo();
   }
 
   FillData(i8_ip1, i8_ip2, i8_ip3, i8_ip4, i16_port) {
-    this.FillDeviceInfo();
     let dataLength = 6;
     this.writeUInt8(dataLength);
     this.writeUInt8(i8_ip1);
@@ -227,10 +227,10 @@ class SCSet4GIPAndPort extends SCModbusPackage {
 class SCSetPhoneNumber extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetPhoneNumber);
+    this.FillDeviceInfo();
   }
 
   FillData(i8_phoneIndex, strPhoneNumber, i8_sendMsg) {
-    this.FillDeviceInfo();
     let dataLength = 16;
     this.writeUInt8(dataLength);
     this.writeUInt8(i8_phoneIndex);
@@ -245,10 +245,10 @@ class SCSetPhoneNumber extends SCModbusPackage {
 class SCGetPhoneNumber extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetPhoneNumber);
+    this.FillDeviceInfo();
   }
 
   FillData(i8_phoneIndex) {
-    this.FillDeviceInfo();
     let dataLength = 1;
     this.writeUInt8(dataLength); // datalength
     this.writeUInt8(i8_phoneIndex);
@@ -259,10 +259,10 @@ class SCGetPhoneNumber extends SCModbusPackage {
 class SCSendStatisticalData extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSendStatisticalData);
+    this.FillDeviceInfo();
   }
 
   FillData(i16_loudian, i16_dianliu, i16_wendu) {
-    this.FillDeviceInfo();
     let dataLength = 16;
     this.writeUInt8(dataLength);
     this.writeUInt16(i16_loudian);
@@ -275,10 +275,10 @@ class SCSendStatisticalData extends SCModbusPackage {
 class SCSetMsgContent extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetMsgContent);
+    this.FillDeviceInfo();
   }
 
   FillData(msgContent) {
-    this.FillDeviceInfo();
     let msgBuffer = Buffer.from(msgContent);
     let dataLength = msgBuffer.length;
     this.writeUInt8(dataLength);
@@ -289,10 +289,10 @@ class SCSetMsgContent extends SCModbusPackage {
 class SCGetMsgContent extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetMsgContent);
+    this.FillDeviceInfo();
   }
 
   FillData() {
-    this.FillDeviceInfo();
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
@@ -301,10 +301,10 @@ class SCGetMsgContent extends SCModbusPackage {
 class SCGetDomainAndPort extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetDomainAndPort);
+    this.FillDeviceInfo();
   }
 
   FillData() {
-    this.FillDeviceInfo();
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
@@ -313,10 +313,10 @@ class SCGetDomainAndPort extends SCModbusPackage {
 class SCSetDomainAndPort extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetDomainAndPort);
+    this.FillDeviceInfo();
   }
 
   FillData(strDomain, i16_port) {
-    this.FillDeviceInfo();
     let domainBuf = Buffer.from(strDomain);
     let dataLength = domainBuf.length + 2;
     this.writeUInt8(dataLength);
@@ -328,10 +328,10 @@ class SCSetDomainAndPort extends SCModbusPackage {
 class SCGetAPN extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetAPN);
+    this.FillDeviceInfo();
   }
 
   FillData() {
-    this.FillDeviceInfo();
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
@@ -340,10 +340,10 @@ class SCGetAPN extends SCModbusPackage {
 class SCSetAPN extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetAPN);
+    this.FillDeviceInfo();
   }
 
   FillData(strAPN) {
-    this.FillDeviceInfo();
     let apnBuf = Buffer.from(strAPN);
     let dataLength = apnBuf.length;
     this.writeUInt8(dataLength);
@@ -354,10 +354,10 @@ class SCSetAPN extends SCModbusPackage {
 class SCGetConnectionType extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetConnectionType);
+    this.FillDeviceInfo();
   }
 
   FillData() {
-    this.FillDeviceInfo();
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
@@ -366,11 +366,11 @@ class SCGetConnectionType extends SCModbusPackage {
 class SCSetConnectionType extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetConnectionType);
+    this.FillDeviceInfo();
   }
 
   // 0 ip, 1 domain
   FillData(i8_type) {
-    this.FillDeviceInfo();
     let dataLength = 1;
     this.writeUInt8(dataLength);
     this.writeUInt8(i8_type);
@@ -380,10 +380,10 @@ class SCSetConnectionType extends SCModbusPackage {
 class SCGetSimUseramePassword extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetSimUseramePassword);
+    this.FillDeviceInfo();
   }
 
   FillData() {
-    this.FillDeviceInfo();
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
@@ -392,10 +392,10 @@ class SCGetSimUseramePassword extends SCModbusPackage {
 class SCSetSimUsernamePassword extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetSimUsernamePassword);
+    this.FillDeviceInfo();
   }
 
   FillData(username, password) {
-    this.FillDeviceInfo();
     let dataStr = username + "," + password;
     let dataBuf = Buffer.from(dataStr);
     let dataLength = dataBuf.length;
@@ -577,6 +577,161 @@ class CSGetConnectionType extends CSModbusPackage {
   ReadData() {
     let dataLength = this.readUInt8();
     this.i8_type = this.readUInt8();
+  }
+}
+
+class CSSetConnectionType extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.i8_type = this.readUInt8();
+  }
+}
+
+class CSGetSimUseramePassword extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    let str = this.readBuffer(this.dataLength).toString();
+    let strArray = str.split(",");
+    this.username = strArray[0];
+    this.password = strArray[1];
+  }
+}
+
+class CSSetSimUsernamePassword extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    let str = this.readBuffer(this.dataLength).toString();
+    let strArray = str.split(",");
+    this.username = strArray[0];
+    this.password = strArray[1];
+  }
+}
+
+// ===================== 具体设备协议 ==============
+class SCGetDeviceAveData extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCGetDeviceAveData);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 0;
+    this.writeUInt8(dataLength);
+  }
+}
+
+class SCReportDeviceAddr extends SCModbusPackage {
+  // deviceAddr 固定为 0xffff
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCReportDeviceAddr);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 0;
+    this.writeUInt8(dataLength);
+  }
+}
+
+class SCGetDeviceCurrentData extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCGetDeviceCurrentData);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 0;
+    this.writeUInt8(dataLength);
+  }
+}
+
+class SCGetHistoryWarningDataCount extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCGetHistoryWarningDataCount);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 0;
+    this.writeUInt8(dataLength);
+  }
+}
+
+class SCGetHistoryWarningData extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCGetHistoryWarningData);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData(i16_recordNum) {
+    let dataLength = 2;
+    this.writeUInt8(dataLength);
+    this.writeUInt16(i16_recordNum);
+  }
+}
+
+class SCGetDeviceBasicParams extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCGetDeviceBasicParams);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 0;
+    this.writeUInt8(dataLength);
+  }
+}
+
+// 差异化处理 -- 这条协议需要查看以前的工程是怎么写的
+class SCSetDeviceBasicParams extends SCModbusPackage {
+  constructor(strAddr4G, deviceAddr, deviceType) {
+    super(strAddr4G, CMD.SCSetDeviceBasicParams);
+    this.deviceAddr = deviceAddr;
+    this.deviceType = deviceType;
+    this.FillDeviceInfo();
+  }
+
+  FillData() {
+    let dataLength = 48;
+    this.writeUInt8(dataLength);
+    this.i16_frameA = 0; // 框架电流
+    this.i16_ratedA = 0; // 额定电流
+    this.i16_longDelayA = 0; // 长延时电流
+    this.i16_shortDelayA = 0; // 短延时电流
+    this.i16_instantProtection = 0; // 瞬时保护值
+    this.i16_leakageLimit = 0; // 漏电上限
+    this.i16_overvoltage = 0; // 过压
+    this.i16_undervoltage = 0; // 欠压
+    this.i16_phaseLoss = 0; // 缺相
+    this.standby9_15 = [0, 0, 0, 0, 0, 0, 0]; // 7个字节
+    this.i8_longDelayTime = 0; // 长延时时间
+    this.i8_shortDelayTime = 0; // 短延时时间
+    this.i8_leakageTripTime = 0; // 漏电脱扣时间
+    this.i16_tripSetting = 0;
   }
 }
 
