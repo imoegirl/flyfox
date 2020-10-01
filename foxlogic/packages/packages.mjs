@@ -450,7 +450,7 @@ class CSSet4GIPAndPort extends CSModbusPackage {
   }
 
   ReadData() {
-    this.dataLength = this.readUInt8();
+    let dataLength = this.readUInt8();
     this.i8_ip1 = this.readUInt8();
     this.i8_ip2 = this.readUInt8();
     this.i8_ip3 = this.readUInt8();
@@ -458,4 +458,126 @@ class CSSet4GIPAndPort extends CSModbusPackage {
     this.i16_port = this.readUInt16();
   }
 }
+
+class CSSetPhoneNumber extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.i8_phoneIndex = this.readUInt8();
+    this.strPhoneNumber = this.readBuffer(11).toString("hex");
+    this.i8_sendMsg = this.readUInt8();
+    // 保留3个字节
+  }
+}
+
+class CSGetPhoneNumber extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.i8_phoneIndex = this.readUInt8();
+    this.strPhoneNumber = this.readBuffer(11).toString("hex");
+    this.i8_sendMsg = this.readUInt8();
+    // 保留3个字节
+  }
+}
+
+class CSSendStatisticaData extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.i16_loudian = this.readUInt16();
+    this.i16_dianliu = this.readUInt16();
+    this.i16_wendu = this.readUInt16();
+    // 10个字节保留
+  }
+}
+
+class CSSetMsgContent extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    let msgContent = this.readBuffer(dataLength).toString();
+  }
+}
+
+class CSGetMsgContent extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    let msgContent = this.readBuffer(dataLength).toString();
+  }
+}
+
+class CSGetDomainAndPort extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.strDomain = this.readBuffer(dataLength - 2).toString();
+    this.i16_port = this.readUInt16();
+  }
+}
+
+class CSSetDomainAndPort extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.strDomain = this.readBuffer(dataLength - 2).toString();
+    this.i16_port = this.readUInt16();
+  }
+}
+
+class CSGetAPN extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.strAPN = this.readBuffer(dataLength).toString();
+  }
+}
+
+class CSSetAPN extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.strAPN = this.readBuffer(dataLength).toString();
+  }
+}
+
+class CSGetConnectionType extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  ReadData() {
+    let dataLength = this.readUInt8();
+    this.i8_type = this.readUInt8();
+  }
+}
+
 export default null;
