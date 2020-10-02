@@ -715,23 +715,52 @@ class SCSetDeviceBasicParams extends SCModbusPackage {
     this.FillDeviceInfo();
   }
 
-  FillData() {
-    let dataLength = 48;
+  FillData(
+    i16_frameA,
+    i16_ratedA,
+    i16_longDelayA,
+    i16_shortDelayA,
+    i16_instantProtection,
+    i16_leakageLimit,
+    i16_overvoltage,
+    i16_undervoltage,
+    i16_phaseLoss,
+    i8_longDelayTime,
+    i8_shortDelayTime,
+    i8_leakageTripTime,
+    i8_tripSetting
+  ) {
+    let dataLength = 36;
     this.writeUInt8(dataLength);
-    this.i16_frameA = 0; // 框架电流
-    this.i16_ratedA = 0; // 额定电流
-    this.i16_longDelayA = 0; // 长延时电流
-    this.i16_shortDelayA = 0; // 短延时电流
-    this.i16_instantProtection = 0; // 瞬时保护值
-    this.i16_leakageLimit = 0; // 漏电上限
-    this.i16_overvoltage = 0; // 过压
-    this.i16_undervoltage = 0; // 欠压
-    this.i16_phaseLoss = 0; // 缺相
-    this.standby9_15 = [0, 0, 0, 0, 0, 0, 0]; // 7个字节
-    this.i8_longDelayTime = 0; // 长延时时间
-    this.i8_shortDelayTime = 0; // 短延时时间
-    this.i8_leakageTripTime = 0; // 漏电脱扣时间
-    this.i16_tripSetting = 0;
+    this.i16_frameA = i16_frameA; // 框架电流
+    this.i16_ratedA = i16_ratedA; // 额定电流
+    this.i16_longDelayA = i16_longDelayA; // 长延时电流
+    this.i16_shortDelayA = i16_shortDelayA; // 短延时电流
+    this.i16_instantProtection = i16_instantProtection; // 瞬时保护值
+    this.i16_leakageLimit = i16_leakageLimit; // 漏电上限
+    this.i16_overvoltage = i16_overvoltage; // 过压
+    this.i16_undervoltage = i16_undervoltage; // 欠压
+    this.i16_phaseLoss = i16_phaseLoss; // 缺相
+    this.i16_standby9_15 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 14个字节
+    this.i8_longDelayTime = i8_longDelayTime; // 长延时时间
+    this.i8_shortDelayTime = i8_shortDelayTime; // 短延时时间
+    this.i8_leakageTripTime = i8_leakageTripTime; // 漏电脱扣时间
+    this.i8_tripSetting = i8_tripSetting;
+
+    this.writeUInt16(this.i16_frameA);
+    this.writeUInt16(this.i16_ratedA);
+    this.writeUInt16(this.i16_longDelayA);
+    this.writeUInt16(this.i16_shortDelayA);
+    this.writeUInt16(this.i16_instantProtection);
+    this.writeUInt16(this.i16_leakageLimit);
+    this.writeUInt16(this.i16_overvoltage);
+    this.writeUInt16(this.i16_undervoltage);
+    this.writeUInt16(this.i16_phaseLoss);
+    this.writeBuffer(Buffer.from(this.i16_standby9_15, "hex"));
+    this.writeUInt8(this.i8_longDelayTime);
+    this.writeUInt8(this.i8_shortDelayTime);
+    this.writeUInt8(this.i8_leakageTripTime);
+    this.writeUInt8(this.i8_tripSetting);
   }
 }
 
