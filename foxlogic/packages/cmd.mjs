@@ -69,22 +69,3 @@ const CMD = {
 };
 
 export default CMD;
-
-// class SCModbusPackage extends SCPackage {
-//     constructor(strAddr4G, cmd) {
-//       super(strAddr4G);
-//       this.PackageType = 0x01;
-
-//       this.modBusSymbol = SC_MODBUS_SYMBOL;
-//       this.deviceAddr = SC_STATIC_ADDR16;
-//       this.deviceType = SC_STATIC_DEVICE_TYPE;
-//       this.CMD = cmd;
-//     }
-
-//     FillDeviceInfo() {
-//       this.writeUInt8(this.modBusSymbol);
-//       this.writeUInt16(this.deviceAddr);
-//       this.writeUInt8(this.deviceType);
-//       this.writeUInt8(this.CMD);
-//     }
-//   }
