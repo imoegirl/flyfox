@@ -2,8 +2,15 @@ import Packages from "./packages.mjs";
 import CMD from "./cmd.mjs";
 
 const HandleMap = new Map();
-HandleMap.set(CMD.PackageTypeOnline, (sessionId, data) => {});
-HandleMap.set(CMD.PackageTypeHeartbeat, (sessionId, data) => {});
+HandleMap.set(CMD.PackageTypeOnline, (sessionId, data) => {
+  global.packageLogger.info("HandlePackage 上线包");
+  let package = new Packages.CSOnline(data);
+  global.foxLogic.connMgr.OnConnectorOnline(sessionId, package.addr4G);
+  global.foxLogic.connMgr.Send(sessionId, data);
+});
+HandleMap.set(CMD.PackageTypeHeartbeat, (sessionId, data) => {
+  global.foxLogic.connMgr.Send(sessionId, data);
+});
 
 HandleMap.set(CMD.CSSet4GIPAndPort, (sessionId, data) => {});
 HandleMap.set(CMD.CSSetPhoneNumber, (sessionId, data) => {});

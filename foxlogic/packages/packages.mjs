@@ -179,7 +179,8 @@ class CSPackage extends BasePackage {
     this.length2 = this.readUInt16();
     this.staticSymbol2 = this.readUInt8();
     this.packageType = this.readUInt8();
-    this.strAddr4G = this.readBuffer(6).toString("hex");
+    this.addr4G = this.readBuffer(6);
+    this.strAddr4G = this.addr4G.toString("hex");
   }
 }
 

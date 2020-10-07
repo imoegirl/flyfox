@@ -113,6 +113,10 @@ class PackageHandler {
             `包处理器获取失败，Modbus消息: 0x${cmd.toString(16)}`
           );
         }
+      } else {
+        global.packageLogger.error(
+          `无法处理的包类型，PackageType: 0x${packageType.toString(16)}`
+        );
       }
     }
   }

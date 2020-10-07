@@ -1,6 +1,6 @@
 import "./foxcore/foxcore.mjs";
 import "./foxlogic/foxlogic.mjs";
-import "./foxlogic/packages/packages.mjs";
+import "./common/common.mjs";
 
 global.logger.info("All Started");
 

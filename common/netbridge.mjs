@@ -1,19 +1,17 @@
 // 这个相当于一个中间层链接着逻辑和Core
 
 class NetBridge {
-  constructor(){
-    
-  }
+  constructor() {}
 
-  HandleConnectionData(session, data){
+  HandleConnectionData(session, data) {
     global.foxLogic.packageHandler.HandlePackage(session.id, data);
   }
 
-  HandleConnectionClose(id){
+  HandleConnectionClose(id) {
     global.foxLogic.connMgr.RemoveConnector(id);
   }
 
-  HandleConnectionError(id){
+  HandleConnectionError(id) {
     global.foxLogic.connMgr.RemoveConnector(id);
   }
 

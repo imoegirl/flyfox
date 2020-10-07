@@ -1,7 +1,7 @@
 import net from "net";
 
 class Session {
-  constructor(id, socket){
+  constructor(id, socket) {
     this.id = id;
     this.socket = socket;
     this.lastMsgTimestamp = -1;
@@ -14,36 +14,36 @@ class Server {
     this.idIndex = 100000000;
   }
 
-  StartServer(port, okCallback, errCallback){
+  StartServer(port, okCallback, errCallback) {
     this.port = port;
     this.okCallback = okCallback;
     this.errCallback = errCallback;
 
     let tServer = this;
-    let sSocket = net.createServer(function(socket){
+    let sSocket = net.createServer(function (socket) {
       tServer.OnConnectionMade(socket);
     });
 
-    sSocket.on("error", (e)=>{
+    sSocket.on("error", (e) => {
       tServer.OnServerError(e);
     });
 
-    sSocket.listen(this.port, function(){
+    sSocket.listen(this.port, function () {
       tServer.OnServerStarted();
-    })
+    });
   }
 
-  OnServerStarted(){
+  OnServerStarted() {
     global.netLogger.info("On Server Started, Port: ", this.port);
     this.okCallback();
   }
 
-  OnServerError(e){
+  OnServerError(e) {
     global.netLogger.error("On Server Error, e.code: ", e.code);
     this.errCallback();
   }
 
-  OnConnectionMade(connection){
+  OnConnectionMade(connection) {
     let sessionId = this.idIndex;
     this.idIndex += 1;
     global.netLogger.info("New client connected! assign id: ", sessionId);
@@ -53,26 +53,26 @@ class Server {
 
     let tServer = this;
 
-    connection.on("data", function(data) {
+    connection.on("data", function (data) {
       global.netLogger.info("Received Data From ", session.id, "Data:\n", data);
       session.lastMsgTimestamp = Math.floor(Date.now() / 1000);
       global.netBridge.HandleConnectionData(session, data);
     });
 
-    connection.on("close", function() {
+    connection.on("close", function () {
       global.netLogger.info("On Session Closed, id: ", session.id);
       tServer.RemoveSession(session.id);
       global.netBridge.HandleConnectionClose(session.id);
     });
 
-    connection.on("error", function(){
+    connection.on("error", function () {
       global.netLogger.error("On Session Error, id: ", session.id);
       tServer.RemoveSession(session.id);
       global.netBridge.HandleConnectionError(session.id);
     });
   }
 
-  HasSession(id){
+  HasSession(id) {
     return this.sessions.has(id);
   }
 
@@ -80,14 +80,14 @@ class Server {
     return this.sessions.get(id);
   }
 
-  RemoveSession(id){
-    if(this.sessions.delete(id)){
+  RemoveSession(id) {
+    if (this.sessions.delete(id)) {
       // delete successful
       global.netLogger.info("Session Removed, id: ", id);
     }
   }
 
-  ShutdownSession(id){
+  ShutdownSession(id) {
     let session = this.GetSession(id);
     global.netLogger.info("ShutdownSession, id: ", id);
     if (session != undefined) {
@@ -95,12 +95,12 @@ class Server {
     }
   }
 
-  GetSessionCount(){
+  GetSessionCount() {
     return this.sessions.size;
   }
 
-  ForeachSession(operatorFunc){
-    for(let [key, value] of this.sessions.entries()){
+  ForeachSession(operatorFunc) {
+    for (let [key, value] of this.sessions.entries()) {
       operatorFunc(value);
     }
   }
@@ -110,7 +110,7 @@ class Server {
     if (session != undefined) {
       global.netLogger.info("Send Data to Session ", id, "Data: \n", bytes);
       session.socket.write(bytes);
-    }else{
+    } else {
       global.global.netLogger.info("数据发送失败，找不到Session，ID: ", id);
     }
   }
