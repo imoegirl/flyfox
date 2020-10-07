@@ -169,11 +169,31 @@ class SCPackage extends BasePackage {
   }
 }
 
+class CSPackage extends BasePackage {
+  constructor(rawData) {
+    super(rawData);
+
+    this.totalDataLength = this.readUInt32();
+    this.staticSymbol1 = this.readUInt8();
+    this.length1 = this.readUInt16();
+    this.length2 = this.readUInt16();
+    this.staticSymbol2 = this.readUInt8();
+    this.packageType = this.readUInt8();
+    this.strAddr4G = this.readBuffer(6).toString("hex");
+  }
+}
+
 // 服务器->客户端，回复上线
 class SCOnline extends SCPackage {
   constructor(strAddr4G) {
     super(strAddr4G);
     this.packageType = 0xc9;
+  }
+}
+
+class CSOnline extends CSPackage {
+  constructor(rawData) {
+    super(rawData);
   }
 }
 
@@ -185,10 +205,22 @@ class SCHeartBeat extends SCPackage {
   }
 }
 
+class CSHeartbeat extends CSPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+}
+
 class SCReset4G extends SCPackage {
   constructor(strAddr4G) {
     super(strAddr4G);
     this.packageType = 0xce;
+  }
+}
+
+class CSReset4G extends CSPackage {
+  constructor(rawData) {
+    super(rawData);
   }
 }
 
@@ -212,6 +244,21 @@ class SCModbusPackage extends SCPackage {
   }
 }
 
+class CSModbusPackage extends CSPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadDeviceInfo();
+  }
+
+  ReadDeviceInfo() {
+    this.modBusSymbol = this.readUInt8();
+    this.deviceAddr = this.readUInt16();
+    this.deviceType = this.readUInt8();
+    this.CMD = this.readUInt8();
+    this.dataLength = this.readUInt8();
+  }
+}
+
 // 3. 修改4G模块IP服务器地(1：4G模块参数设置)
 class SCSet4GIPAndPort extends SCModbusPackage {
   constructor(strAddr4G) {
@@ -227,6 +274,21 @@ class SCSet4GIPAndPort extends SCModbusPackage {
     this.writeUInt8(i8_ip3);
     this.writeUInt8(i8_ip4);
     this.writeUInt16(i16_port);
+  }
+}
+
+class CSSet4GIPAndPort extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i8_ip1 = this.readUInt8();
+    this.i8_ip2 = this.readUInt8();
+    this.i8_ip3 = this.readUInt8();
+    this.i8_ip4 = this.readUInt8();
+    this.i16_port = this.readUInt16();
   }
 }
 
@@ -248,6 +310,20 @@ class SCSetPhoneNumber extends SCModbusPackage {
   }
 }
 
+class CSSetPhoneNumber extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i8_phoneIndex = this.readUInt8();
+    this.strPhoneNumber = this.readBuffer(11).toString("hex");
+    this.i8_sendMsg = this.readUInt8();
+    // 保留3个字节
+  }
+}
+
 // 6. 获取手机号
 class SCGetPhoneNumber extends SCModbusPackage {
   constructor(strAddr4G) {
@@ -259,6 +335,20 @@ class SCGetPhoneNumber extends SCModbusPackage {
     let dataLength = 1;
     this.writeUInt8(dataLength); // datalength
     this.writeUInt8(i8_phoneIndex);
+  }
+}
+
+class CSGetPhoneNumber extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i8_phoneIndex = this.readUInt8();
+    this.strPhoneNumber = this.readBuffer(11).toString("hex");
+    this.i8_sendMsg = this.readUInt8();
+    // 保留3个字节
   }
 }
 
@@ -279,6 +369,20 @@ class SCSendStatisticalData extends SCModbusPackage {
   }
 }
 
+class CSSendStatisticaData extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i16_loudian = this.readUInt16();
+    this.i16_dianliu = this.readUInt16();
+    this.i16_wendu = this.readUInt16();
+    // 10个字节保留
+  }
+}
+
 class SCSetMsgContent extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCSetMsgContent);
@@ -290,6 +394,17 @@ class SCSetMsgContent extends SCModbusPackage {
     let dataLength = msgBuffer.length;
     this.writeUInt8(dataLength);
     this.writeBuffer(msgBuffer);
+  }
+}
+
+class CSSetMsgContent extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.msgContent = this.readBuffer(this.dataLength).toString();
   }
 }
 
@@ -305,6 +420,17 @@ class SCGetMsgContent extends SCModbusPackage {
   }
 }
 
+class CSGetMsgContent extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.msgContent = this.readBuffer(this.dataLength).toString();
+  }
+}
+
 class SCGetDomainAndPort extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetDomainAndPort);
@@ -314,6 +440,18 @@ class SCGetDomainAndPort extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetDomainAndPort extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.strDomain = this.readBuffer(this.dataLength - 2).toString();
+    this.i16_port = this.readUInt16();
   }
 }
 
@@ -332,6 +470,18 @@ class SCSetDomainAndPort extends SCModbusPackage {
   }
 }
 
+class CSSetDomainAndPort extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.strDomain = this.readBuffer(this.dataLength - 2).toString();
+    this.i16_port = this.readUInt16();
+  }
+}
+
 class SCGetAPN extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetAPN);
@@ -341,6 +491,17 @@ class SCGetAPN extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetAPN extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.strAPN = this.readBuffer(this.dataLength).toString();
   }
 }
 
@@ -358,6 +519,17 @@ class SCSetAPN extends SCModbusPackage {
   }
 }
 
+class CSSetAPN extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.strAPN = this.readBuffer(this.dataLength).toString();
+  }
+}
+
 class SCGetConnectionType extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetConnectionType);
@@ -367,6 +539,17 @@ class SCGetConnectionType extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetConnectionType extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i8_type = this.readUInt8();
   }
 }
 
@@ -384,6 +567,17 @@ class SCSetConnectionType extends SCModbusPackage {
   }
 }
 
+class CSSetConnectionType extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    this.i8_type = this.readUInt8();
+  }
+}
+
 class SCGetSimUseramePassword extends SCModbusPackage {
   constructor(strAddr4G) {
     super(strAddr4G, CMD.SCGetSimUseramePassword);
@@ -393,6 +587,20 @@ class SCGetSimUseramePassword extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetSimUseramePassword extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  ReadData() {
+    let str = this.readBuffer(this.dataLength).toString();
+    let strArray = str.split(",");
+    this.username = strArray[0];
+    this.password = strArray[1];
   }
 }
 
@@ -408,214 +616,6 @@ class SCSetSimUsernamePassword extends SCModbusPackage {
     let dataLength = dataBuf.length;
     this.writeUInt8(dataLength);
     this.writeBuffer(dataBuf);
-  }
-}
-// ----------------------------------------
-class CSPackage extends BasePackage {
-  constructor(rawData) {
-    super(rawData);
-
-    this.totalDataLength = this.readUInt32();
-    this.staticSymbol1 = this.readUInt8();
-    this.length1 = this.readUInt16();
-    this.length2 = this.readUInt16();
-    this.staticSymbol2 = this.readUInt8();
-    this.packageType = this.readUInt8();
-    this.strAddr4G = this.readBuffer(6).toString("hex");
-  }
-}
-
-class CSOnline extends CSPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-}
-
-class CSHeartbeat extends CSPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-}
-
-class CSReset4G extends CSPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-}
-
-class CSModbusPackage extends CSPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadDeviceInfo();
-  }
-
-  ReadDeviceInfo() {
-    this.modBusSymbol = this.readUInt8();
-    this.deviceAddr = this.readUInt16();
-    this.deviceType = this.readUInt8();
-    this.CMD = this.readUInt8();
-    this.dataLength = this.readUInt8();
-  }
-}
-
-class CSSet4GIPAndPort extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i8_ip1 = this.readUInt8();
-    this.i8_ip2 = this.readUInt8();
-    this.i8_ip3 = this.readUInt8();
-    this.i8_ip4 = this.readUInt8();
-    this.i16_port = this.readUInt16();
-  }
-}
-
-class CSSetPhoneNumber extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i8_phoneIndex = this.readUInt8();
-    this.strPhoneNumber = this.readBuffer(11).toString("hex");
-    this.i8_sendMsg = this.readUInt8();
-    // 保留3个字节
-  }
-}
-
-class CSGetPhoneNumber extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i8_phoneIndex = this.readUInt8();
-    this.strPhoneNumber = this.readBuffer(11).toString("hex");
-    this.i8_sendMsg = this.readUInt8();
-    // 保留3个字节
-  }
-}
-
-class CSSendStatisticaData extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i16_loudian = this.readUInt16();
-    this.i16_dianliu = this.readUInt16();
-    this.i16_wendu = this.readUInt16();
-    // 10个字节保留
-  }
-}
-
-class CSSetMsgContent extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.msgContent = this.readBuffer(this.dataLength).toString();
-  }
-}
-
-class CSGetMsgContent extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.msgContent = this.readBuffer(this.dataLength).toString();
-  }
-}
-
-class CSGetDomainAndPort extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.strDomain = this.readBuffer(this.dataLength - 2).toString();
-    this.i16_port = this.readUInt16();
-  }
-}
-
-class CSSetDomainAndPort extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.strDomain = this.readBuffer(this.dataLength - 2).toString();
-    this.i16_port = this.readUInt16();
-  }
-}
-
-class CSGetAPN extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.strAPN = this.readBuffer(this.dataLength).toString();
-  }
-}
-
-class CSSetAPN extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.strAPN = this.readBuffer(this.dataLength).toString();
-  }
-}
-
-class CSGetConnectionType extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i8_type = this.readUInt8();
-  }
-}
-
-class CSSetConnectionType extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    this.i8_type = this.readUInt8();
-  }
-}
-
-class CSGetSimUseramePassword extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  ReadData() {
-    let str = this.readBuffer(this.dataLength).toString();
-    let strArray = str.split(",");
-    this.username = strArray[0];
-    this.password = strArray[1];
   }
 }
 
@@ -648,6 +648,26 @@ class SCGetDeviceAveData extends SCModbusPackage {
   }
 }
 
+class CSGetDeviceAveData extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  // 直接读数据
+  ReadData() {
+    if (this.dataLength != 24) {
+      // error
+    }
+
+    this.i16_leakage = this.readUInt16(); // 漏电
+    this.i16_neutralElectricity = this.readUInt16(); // 中性电流
+    this.i16_temperature = this.readUInt16(); // 温度
+    this.i16_stateSignal = this.readUInt16(); // 变位信号（位操作）
+    // 16个字节备用，无需解析
+  }
+}
+
 class SCReportDeviceAddr extends SCModbusPackage {
   // deviceAddr 固定为 0xffff
   constructor(strAddr4G, deviceAddr, deviceType) {
@@ -660,6 +680,26 @@ class SCReportDeviceAddr extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSReportDeviceAddr extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  // 直接读数据
+  ReadData() {
+    // deviceAddr - deviceType
+    this.deviceMap = new Map();
+
+    let deviceCount = this.dataLength / 3;
+    for (let i = 0; i < deviceCount; ++i) {
+      let deviceAddr = this.readUInt16();
+      let deviceType = this.readUInt8();
+      this.deviceMap.set(deviceAddr, deviceType);
+    }
   }
 }
 
@@ -677,6 +717,50 @@ class SCGetDeviceCurrentData extends SCModbusPackage {
   }
 }
 
+class CSGetDeviceCurrentData extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  // 直接读数据
+  ReadData() {
+    if (this.deviceType == 0x01 || this.deviceType == 0x02) {
+      this.ReadData_Breaker_Reclosure();
+    } else if (this.deviceType == 0x03) {
+      this.ReadData_Monitoring();
+    }
+  }
+
+  ReadData_Breaker_Reclosure() {
+    this.i16_electricityA = this.readUInt16();
+    this.i16_electricityB = this.readUInt16();
+    this.i16_electricityC = this.readUInt16();
+    this.i16_electricityN = this.readUInt16();
+    this.i16_leakage = this.readUInt16();
+    this.i16_voltageA = this.readUInt16();
+    this.i16_voltageB = this.readUInt16();
+    this.i16_voltageC = this.readUInt16();
+    this.i16_temperature = this.readUInt16();
+    this.i16_activePowerA = this.readUInt16();
+    this.i16_activePowerB = this.readUInt16();
+    this.i16_activePowerC = this.readUInt16();
+    this.i16_wattlessPowerA = this.readUInt16();
+    this.i16_wattlessPowerB = this.readUInt16();
+    this.i16_wattlessPowerC = this.readUInt16();
+    this.i16_powerFactorA = this.readUInt16();
+    this.i16_powerFactorB = this.readUInt16();
+    this.i16_powerFactorC = this.readUInt16();
+    // standy 12 bytes
+  }
+
+  ReadData_Monitoring() {
+    this.i16_leakage = this.readUInt16(); // 漏电
+    this.i16_neutralElectricity = this.readUInt16(); // 中性电流
+    this.i16_temperature = this.readUInt16(); // 温度
+  }
+}
+
 class SCGetHistoryWarningDataCount extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCGetHistoryWarningDataCount);
@@ -688,6 +772,18 @@ class SCGetHistoryWarningDataCount extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetHistoryWarningDataCount extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  // 直接读数据
+  ReadData() {
+    this.warningCount = this.readUInt16();
   }
 }
 
@@ -706,6 +802,24 @@ class SCGetHistoryWarningData extends SCModbusPackage {
   }
 }
 
+class CSGetHistoryWarningData extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+    this.ReadData();
+  }
+
+  // 直接读数据
+  ReadData() {
+    this.i16_leakage = this.readUInt16();
+    this.i16_neutralElectricity = this.readUInt16();
+    this.i16_temperature = this.readUInt16();
+    this.standby = this.readBuffer(6);
+    this.i16_faultCause = this.readUInt16();
+    this.bcdBuffer = this.readBuffer(6);
+    this.i16_recordNum = this.readUInt16();
+  }
+}
+
 class SCGetDeviceBasicParams extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCGetDeviceBasicParams);
@@ -717,6 +831,59 @@ class SCGetDeviceBasicParams extends SCModbusPackage {
   FillData() {
     let dataLength = 0;
     this.writeUInt8(dataLength);
+  }
+}
+
+class CSGetDeviceBasicParams extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {
+    if (this.deviceType == 0x01 || this.deviceType == 0x02) {
+      this.ReadData_Breaker_Reclosure();
+    } else if (this.deviceType == 0x03) {
+      this.ReadData_Monitoring();
+    }
+  }
+
+  ReadData_Breaker_Reclosure() {
+    this.i16_frameA = this.readUInt16(); // 框架电流
+    this.i16_ratedA = this.readUInt16(); // 额定电流
+    this.i16_longDelayA = this.readUInt16(); // 长延时电流
+    this.i16_shortDelayA = this.readUInt16(); // 短延时电流
+    this.i16_instantProtection = this.readUInt16(); // 瞬时保护值
+    this.i16_leakageLimit = this.readUInt16(); // 漏电上限
+    this.i16_overvoltage = this.readUInt16(); // 过压
+    this.i16_undervoltage = this.readUInt16(); // 欠压
+    this.i16_phaseLoss = this.readUInt16(); // 缺相
+    this.i16_standby9_15 = this.readByteArray(14); // 14个字节
+    this.i8_longDelayTime = this.readUInt8(); // 长延时时间
+    this.i8_shortDelayTime = this.readUInt8(); // 短延时时间
+    this.i8_leakageTripTime = this.readUInt8(); // 漏电脱扣时间
+    this.i8_tripSetting = this.readUInt8();
+  }
+
+  ReadData_Monitoring() {
+    this.i8_leakageLimit1 = this.readUInt8();
+    this.i8_leakageLimit2 = this.readUInt8();
+    this.i8_leakageLimit3 = this.readUInt8();
+    this.i8_nElectricity1 = this.readUInt8();
+    this.i8_nElectricity2 = this.readUInt8();
+    this.i8_temperatureWarning1 = this.readUInt8();
+    this.i8_temperatureWarning2 = this.readUInt8();
+    this.i8_arresterLeakage1 = this.readUInt8();
+    this.i8_arresterLeakage2 = this.readUInt8();
+    this.i8_arresterLeakage3 = this.readUInt8();
+    this.readBuffer(6);
+    this.i8_leakageDelay = this.readUInt8();
+    this.i8_electricityDelay = this.readUInt8();
+    this.i8_temperatureDelay = this.readUInt8();
+    this.i8_leakageElectricityDelay = this.readUInt8();
+    this.i8_warningSetting = this.readUInt8();
+    this.i8_isUpload = this.readUInt8();
+    this.readBuffer(10);
   }
 }
 
@@ -839,6 +1006,59 @@ class SCSetDeviceBasicParams extends SCModbusPackage {
   }
 }
 
+class CSSetDeviceBasicParams extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {
+    if (this.deviceType == 0x01 || this.deviceType == 0x02) {
+      this.ReadData_Breaker_Reclosure();
+    } else if (this.deviceType == 0x03) {
+      this.ReadData_Monitoring();
+    }
+  }
+
+  ReadData_Breaker_Reclosure() {
+    this.i16_frameA = this.readUInt16(); // 框架电流
+    this.i16_ratedA = this.readUInt16(); // 额定电流
+    this.i16_longDelayA = this.readUInt16(); // 长延时电流
+    this.i16_shortDelayA = this.readUInt16(); // 短延时电流
+    this.i16_instantProtection = this.readUInt16(); // 瞬时保护值
+    this.i16_leakageLimit = this.readUInt16(); // 漏电上限
+    this.i16_overvoltage = this.readUInt16(); // 过压
+    this.i16_undervoltage = this.readUInt16(); // 欠压
+    this.i16_phaseLoss = this.readUInt16(); // 缺相
+    this.i16_standby9_15 = this.readByteArray(14); // 14个字节
+    this.i8_longDelayTime = this.readUInt8(); // 长延时时间
+    this.i8_shortDelayTime = this.readUInt8(); // 短延时时间
+    this.i8_leakageTripTime = this.readUInt8(); // 漏电脱扣时间
+    this.i8_tripSetting = this.readUInt8();
+  }
+
+  ReadData_Monitoring() {
+    this.i8_leakageLimit1 = this.readUInt8();
+    this.i8_leakageLimit2 = this.readUInt8();
+    this.i8_leakageLimit3 = this.readUInt8();
+    this.i8_nElectricity1 = this.readUInt8();
+    this.i8_nElectricity2 = this.readUInt8();
+    this.i8_temperatureWarning1 = this.readUInt8();
+    this.i8_temperatureWarning2 = this.readUInt8();
+    this.i8_arresterLeakage1 = this.readUInt8();
+    this.i8_arresterLeakage2 = this.readUInt8();
+    this.i8_arresterLeakage3 = this.readUInt8();
+    this.readBuffer(6);
+    this.i8_leakageDelay = this.readUInt8();
+    this.i8_electricityDelay = this.readUInt8();
+    this.i8_temperatureDelay = this.readUInt8();
+    this.i8_leakageElectricityDelay = this.readUInt8();
+    this.i8_warningSetting = this.readUInt8();
+    this.i8_isUpload = this.readUInt8();
+    this.readBuffer(10);
+  }
+}
+
 class SCSetDeviceCurrentTime extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCSetDeviceCurrentTime);
@@ -873,6 +1093,24 @@ class SCSetDeviceCurrentTime extends SCModbusPackage {
   }
 }
 
+class CSSetDeviceCurrentTime extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {
+    this.bcdBuffer = this.readBuffer(6);
+    this.dateArray = foxCore.foxUtil.BCD2Date(this.bcdBuffer);
+    this.year = dateArray[0];
+    this.month = dateArray[1];
+    this.day = dateArray[2];
+    this.hour = datearray[3];
+    this.minute = dateArray[4];
+    this.second = dateArray[5];
+  }
+}
+
 class SCPoweroffDevice extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCPoweroffDevice);
@@ -885,6 +1123,16 @@ class SCPoweroffDevice extends SCModbusPackage {
     let dataLength = 0;
     this.writeUInt8(dataLength);
   }
+}
+
+// 无回复数据
+class CSPoweroffDevice extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {}
 }
 
 class SCCorrectParams extends SCModbusPackage {
@@ -919,6 +1167,16 @@ class SCCorrectParams extends SCModbusPackage {
   }
 }
 
+// 无回复数据
+class CSCorrectParams extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {}
+}
+
 class SCSetDeviceAddr extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCSetDeviceAddr);
@@ -931,6 +1189,17 @@ class SCSetDeviceAddr extends SCModbusPackage {
     let dataLength = 2;
     this.writeUInt8(dataLength);
     this.writeUInt16(newDeviceAddr);
+  }
+}
+
+class CSSetDeviceAddr extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {
+    this.newDeviceAddr = this.readUInt16();
   }
 }
 
@@ -948,6 +1217,15 @@ class SCPoweronDevice extends SCModbusPackage {
   }
 }
 
+class CSPoweronDevice extends CSModbusPackage {
+  constructor(rawData) {
+    super(rawData);
+  }
+
+  // 直接读数据
+  ReadData() {}
+}
+
 class SCStateSignal extends SCModbusPackage {
   constructor(strAddr4G, deviceAddr, deviceType) {
     super(strAddr4G, CMD.SCStateSignal);
@@ -962,175 +1240,7 @@ class SCStateSignal extends SCModbusPackage {
   }
 }
 
-// ======================= 下面是下位机回复 ==============================
-class CSGetDeviceAveData extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  // 直接读数据
-  ReadData() {
-    if (this.dataLength != 24) {
-      // error
-    }
-
-    this.i16_leakage = this.readUInt16(); // 漏电
-    this.i16_neutralElectricity = this.readUInt16(); // 中性电流
-    this.i16_temperature = this.readUInt16(); // 温度
-    this.i16_stateSignal = this.readUInt16(); // 变位信号（位操作）
-    // 16个字节备用，无需解析
-  }
-}
-
-class CSReportDeviceAddr extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  // 直接读数据
-  ReadData() {
-    // deviceAddr - deviceType
-    this.deviceMap = new Map();
-
-    let deviceCount = this.dataLength / 3;
-    for (let i = 0; i < deviceCount; ++i) {
-      let deviceAddr = this.readUInt16();
-      let deviceType = this.readUInt8();
-      this.deviceMap.set(deviceAddr, deviceType);
-    }
-  }
-}
-
-class CSGetDeviceCurrentData extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  // 直接读数据
-  ReadData() {
-    if (this.deviceType == 0x01 || this.deviceType == 0x02) {
-      this.ReadData_Breaker_Reclosure();
-    } else if (this.deviceType == 0x03) {
-      this.ReadData_Monitoring();
-    }
-  }
-
-  ReadData_Breaker_Reclosure() {
-    this.i16_electricityA = this.readUInt16();
-    this.i16_electricityB = this.readUInt16();
-    this.i16_electricityC = this.readUInt16();
-    this.i16_electricityN = this.readUInt16();
-    this.i16_leakage = this.readUInt16();
-    this.i16_voltageA = this.readUInt16();
-    this.i16_voltageB = this.readUInt16();
-    this.i16_voltageC = this.readUInt16();
-    this.i16_temperature = this.readUInt16();
-    this.i16_activePowerA = this.readUInt16();
-    this.i16_activePowerB = this.readUInt16();
-    this.i16_activePowerC = this.readUInt16();
-    this.i16_wattlessPowerA = this.readUInt16();
-    this.i16_wattlessPowerB = this.readUInt16();
-    this.i16_wattlessPowerC = this.readUInt16();
-    this.i16_powerFactorA = this.readUInt16();
-    this.i16_powerFactorB = this.readUInt16();
-    this.i16_powerFactorC = this.readUInt16();
-    // standy 12 bytes
-  }
-
-  ReadData_Monitoring() {
-    this.i16_leakage = this.readUInt16(); // 漏电
-    this.i16_neutralElectricity = this.readUInt16(); // 中性电流
-    this.i16_temperature = this.readUInt16(); // 温度
-  }
-}
-
-class CSGetHistoryWarningDataCount extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  // 直接读数据
-  ReadData() {
-    this.warningCount = this.readUInt16();
-  }
-}
-
-class CSGetHistoryWarningData extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-    this.ReadData();
-  }
-
-  // 直接读数据
-  ReadData() {
-    this.i16_leakage = this.readUInt16();
-    this.i16_neutralElectricity = this.readUInt16();
-    this.i16_temperature = this.readUInt16();
-    this.standby = this.readBuffer(6);
-    this.i16_faultCause = this.readUInt16();
-    this.bcdBuffer = this.readBuffer(6);
-    this.i16_recordNum = this.readUInt16();
-  }
-}
-
-class CSGetDeviceBasicParams extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
-class CSSetDeviceCurrentTime extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
-class CSPoweroffDevice extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
-class CSCorrectParams extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
-class CSSetDeviceAddr extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
-class CSPoweronDevice extends CSModbusPackage {
-  constructor(rawData) {
-    super(rawData);
-  }
-
-  // 直接读数据
-  ReadData() {}
-}
-
+// 无回复数据
 class CSStateSignal extends CSModbusPackage {
   constructor(rawData) {
     super(rawData);
@@ -1149,4 +1259,74 @@ class CSException extends CSModbusPackage {
   ReadData() {}
 }
 
-export default null;
+const Packages = {
+  SCSet4GIPAndPort: SCSet4GIPAndPort,
+  SCSetPhoneNumber: SCSetPhoneNumber,
+  SCGetPhoneNumber: SCGetPhoneNumber,
+  SCSendStatisticalData: SCSendStatisticalData,
+  SCSetMsgContent: SCSetMsgContent,
+  SCGetMsgContent: SCGetMsgContent,
+  SCGetDomainAndPort: SCGetDomainAndPort,
+  SCSetDomainAndPort: SCSetDomainAndPort,
+  SCGetAPN: SCGetAPN,
+  SCSetAPN: SCSetAPN,
+  SCGetConnectionType: SCGetConnectionType,
+  SCSetConnectionType: SCSetConnectionType,
+  SCGetSimUseramePassword: SCGetSimUseramePassword,
+  SCSetSimUsernamePassword: SCSetSimUsernamePassword,
+
+  CSSet4GIPAndPort: CSSet4GIPAndPort,
+  CSSetPhoneNumber: CSSetPhoneNumber,
+  CSGetPhoneNumber: CSGetPhoneNumber,
+  CSSendStatisticaData: CSSendStatisticaData,
+  CSSetMsgContent: CSSetMsgContent,
+  CSGetMsgContent: CSGetMsgContent,
+  CSGetDomainAndPort: CSGetDomainAndPort,
+  CSSetDomainAndPort: CSSetDomainAndPort,
+  CSGetAPN: CSGetAPN,
+  CSSetAPN: CSSetAPN,
+  CSGetConnectionType: CSGetConnectionType,
+  CSSetConnectionType: CSSetConnectionType,
+  CSGetSimUseramePassword: CSGetSimUseramePassword,
+  CSSetSimUsernamePassword: CSSetSimUsernamePassword,
+
+  // 断路器相关协议
+  // 断路器和智能监测协议CMD都一样，但是内容不一样
+  // 需要在封包和解包时做具体区分
+
+  // 智能监测特别协议
+  SCGetDeviceAveData: SCGetDeviceAveData,
+  CSGetDeviceAveData: CSGetDeviceAveData,
+
+  // 断路器和智能监测共用的(要区分设备类型)
+  SCReportDeviceAddr: SCReportDeviceAddr, // 设备地址固定0xffff
+  SCGetDeviceCurrentData: SCGetDeviceCurrentData,
+  SCGetHistoryWarningDataCount: SCGetHistoryWarningDataCount,
+  SCGetHistoryWarningData: SCGetHistoryWarningData,
+  SCGetDeviceBasicParams: SCGetDeviceBasicParams,
+  SCSetDeviceBasicParams: SCSetDeviceBasicParams, // 差异处理
+  SCSetDeviceCurrentTime: SCSetDeviceCurrentTime,
+  SCPoweroffDevice: SCPoweroffDevice,
+  SCCorrectParams: SCCorrectParams,
+  SCSetDeviceAddr: SCSetDeviceAddr,
+  SCPoweronDevice: SCPoweronDevice,
+  SCStateSignal: SCStateSignal,
+
+  CSReportDeviceAddr: CSReportDeviceAddr,
+  CSGetDeviceCurrentData: CSGetDeviceCurrentData, // 差异处理
+  CSGetHistoryWarningDataCount: CSGetHistoryWarningDataCount,
+  CSGetHistoryWarningData: CSGetHistoryWarningData, // 差异处理
+  CSGetDeviceBasicParams: CSGetDeviceBasicParams, // 差异处理
+  CSSetDeviceBasicParams: CSSetDeviceBasicParams, // 差异处理
+  CSSetDeviceCurrentTime: CSSetDeviceCurrentTime,
+  CSPoweroffDevice: CSPoweroffDevice,
+  CSCorrectParams: CSCorrectParams,
+  CSSetDeviceAddr: CSSetDeviceAddr,
+  CSPoweronDevice: CSPoweronDevice,
+  CSStateSignal: CSStateSignal, // 差异处理
+
+  CSException: CSException,
+};
+
+export default Packages;
+k;

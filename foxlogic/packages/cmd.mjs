@@ -1,4 +1,7 @@
 const CMD = {
+  PackageTypeOnline: 0xc9, // 这个是标示包类型的，特别处理
+  PackageTypeHeartbeat: 0xc6, // 这个是标示包类型的，特别处理
+
   // 4G 相关协议
   SCSet4GIPAndPort: 0x31,
   SCSetPhoneNumber: 0x42,
