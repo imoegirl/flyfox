@@ -15,7 +15,7 @@ const CMD = {
   SCSetAPN: 0x4c,
   SCGetConnectionType: 0x71,
   SCSetConnectionType: 0x72,
-  SCGetSimUseramePassword: 0x73,
+  CSGetSimUsernamePassword: 0x73,
   SCSetSimUsernamePassword: 0x74,
 
   CSSet4GIPAndPort: 0xd1,
@@ -30,7 +30,7 @@ const CMD = {
   CSSetAPN: 0xcc,
   CSGetConnectionType: 0x91,
   CSSetConnectionType: 0x92,
-  CSGetSimUseramePassword: 0x93,
+  CSGetSimUsernamePassword: 0x93,
   CSSetSimUsernamePassword: 0x94,
 
   // 断路器相关协议

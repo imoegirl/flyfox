@@ -591,7 +591,7 @@ class SCGetSimUseramePassword extends SCModbusPackage {
   }
 }
 
-class CSGetSimUseramePassword extends CSModbusPackage {
+class CSGetSimUsernamePassword extends CSModbusPackage {
   constructor(rawData) {
     super(rawData);
     this.ReadData();
@@ -1288,7 +1288,7 @@ const Packages = {
   CSSetAPN: CSSetAPN,
   CSGetConnectionType: CSGetConnectionType,
   CSSetConnectionType: CSSetConnectionType,
-  CSGetSimUseramePassword: CSGetSimUseramePassword,
+  CSGetSimUsernamePassword: CSGetSimUsernamePassword,
   CSSetSimUsernamePassword: CSSetSimUsernamePassword,
 
   // 断路器相关协议
