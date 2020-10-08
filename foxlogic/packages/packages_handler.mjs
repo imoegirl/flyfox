@@ -1,5 +1,3 @@
-import HandleMap from "./handle_map.mjs";
-
 const PACKAGE_TYPE_INDEX = 10;
 const PACKAGE_TYPE_ONLINE = 0xc9;
 const PACKAGE_TYPE_HEARTBEAT = 0xc6;
@@ -82,7 +80,7 @@ class PackageHandler {
       global.packageLogger.info("处理数据包，类型: ", packageType);
 
       if (packageType == PACKAGE_TYPE_ONLINE) {
-        let handler = HandleMap.get(PACKAGE_TYPE_ONLINE);
+        let handler = global.foxLogic.handleMap.get(PACKAGE_TYPE_ONLINE);
         if (handler != undefined) {
           handler(id, data);
         } else {
@@ -93,7 +91,7 @@ class PackageHandler {
           );
         }
       } else if (packageType == PACKAGE_TYPE_HEARTBEAT) {
-        let handler = HandleMap.get(PACKAGE_TYPE_HEARTBEAT);
+        let handler = global.foxLogic.handleMap.get(PACKAGE_TYPE_HEARTBEAT);
         if (handler != undefined) {
           handler(id, data);
         } else {
@@ -105,7 +103,7 @@ class PackageHandler {
         }
       } else if (packageType == PACKAGE_TYPE_MODBUS) {
         let cmd = data[MODBUS_CMD_INDEX];
-        let handler = HandleMap.get(cmd);
+        let handler = global.foxLogic.handleMap.get(cmd);
         if (handler != undefined) {
           handler(id, data);
         } else {
