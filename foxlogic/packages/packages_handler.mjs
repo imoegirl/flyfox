@@ -33,7 +33,7 @@ function IsDataValid(sessionId, data) {
   let buffer = data; //Buffer.from(data);
 
   let totalLength = buffer.readUInt32BE(0);
-  let staticSymbol1 = buffer[5];
+  let staticSymbol1 = buffer[4];
   let length1 = buffer.readUInt16BE(5);
   let length2 = buffer.readUInt16BE(7);
   let staticSymbol2 = buffer[9];
@@ -76,8 +76,10 @@ class PackageHandler {
 
   HandlePackage(id, data) {
     if (IsDataValid(id, data)) {
-      let packageType = buffer[PACKAGE_TYPE_INDEX];
-      global.packageLogger.info("处理数据包，类型: ", packageType);
+      let packageType = data[PACKAGE_TYPE_INDEX];
+      global.packageLogger.info(
+        `处理数据包，类型: 0x${packageType.toString(16)}`
+      );
 
       if (packageType == PACKAGE_TYPE_ONLINE) {
         let handler = global.foxLogic.handleMap.get(PACKAGE_TYPE_ONLINE);

@@ -54,7 +54,7 @@ class Server {
     let tServer = this;
 
     connection.on("data", function (data) {
-      global.netLogger.info("Received Data From ", session.id, "Data:\n", data);
+      global.netLogger.info("Received Data From ", session.id, "Data: ", data);
       session.lastMsgTimestamp = Math.floor(Date.now() / 1000);
       global.netBridge.HandleConnectionData(session, data);
     });
@@ -108,7 +108,7 @@ class Server {
   Send(id, bytes) {
     let session = this.GetSession(id);
     if (session != undefined) {
-      global.netLogger.info("Send Data to Session ", id, "Data: \n", bytes);
+      global.netLogger.info("Send Data to Session ", id, "Data: ", bytes);
       session.socket.write(bytes);
     } else {
       global.global.netLogger.info("数据发送失败，找不到Session，ID: ", id);

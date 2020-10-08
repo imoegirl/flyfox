@@ -206,7 +206,7 @@ class SCHeartBeat extends SCPackage {
   }
 }
 
-class CSHeartbeat extends CSPackage {
+class CSHeartBeat extends CSPackage {
   constructor(rawData) {
     super(rawData);
   }
@@ -1261,6 +1261,12 @@ class CSException extends CSModbusPackage {
 }
 
 const Packages = {
+  SCOnline: SCOnline,
+  SCHeartBeat: SCHeartBeat,
+
+  CSOnline: CSOnline,
+  CSHeartBeat: CSHeartBeat,
+
   SCSet4GIPAndPort: SCSet4GIPAndPort,
   SCSetPhoneNumber: SCSetPhoneNumber,
   SCGetPhoneNumber: SCGetPhoneNumber,

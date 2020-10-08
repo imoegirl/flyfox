@@ -33,3 +33,4 @@ function StartServer() {
 }
 
 // ConnectDB();
+StartServer();
