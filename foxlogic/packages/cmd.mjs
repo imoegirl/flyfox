@@ -1,4 +1,6 @@
 const CMD = {
+  Device4GOffline: 0x00,  // 这套系统用到的和View层通信标识
+
   PackageTypeOnline: 0xc9, // 这个是标示包类型的，特别处理
   PackageTypeHeartbeat: 0xc6, // 这个是标示包类型的，特别处理
 

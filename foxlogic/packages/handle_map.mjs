@@ -7,9 +7,12 @@ const HandleMap = new Map();
 HandleMap.set(CMD.PackageTypeOnline, (sessionId, data) => {
   global.packageLogger.info("HandlePackage 上线包");
   let msg = new Packages.CSOnline(data);
-  global.foxLogic.connMgr.OnConnectorOnline(sessionId, msg.addr4G);
+  global.foxLogic.connMgr.OnConnectorOnline(sessionId, msg.strAddr4G);
   global.foxLogic.connMgr.Send(sessionId, data);
+
+  // global.foxLogic.renderBridge.Send(CMD.PackageTypeOnline, msg);
 });
+
 HandleMap.set(CMD.PackageTypeHeartbeat, (sessionId, data) => {
   let msg = new Packages.CSHeartBeat(data);
   global.packageLogger.info(`HandlePackage 心跳包，4G地址 0x${msg.strAddr4G}`);
@@ -21,31 +24,46 @@ HandleMap.set(CMD.CSSet4GIPAndPort, (sessionId, data) => {
   global.packageLogger.info(
     `HandlePackage 设置IP和端口，4G地址 0x${msg.strAddr4G}`
   );
+  
+  // global.foxLogic.renderBridge.Send(CMD.CSSet4GIPAndPort, msg);
 });
+
 HandleMap.set(CMD.CSSetPhoneNumber, (sessionId, data) => {
   let msg = new Packages.CSSetPhoneNumber(data);
   global.packageLogger.info(
     `HandlePackage 设置手机号，4G地址 0x${msg.strAddr4G}`
   );
+
+  // global.foxLogic.renderBridge.Send(CMD.CSSetPhoneNumber, msg);
 });
+
 HandleMap.set(CMD.CSGetPhoneNumber, (sessionId, data) => {
   let msg = new Packages.CSGetPhoneNumber(data);
   global.packageLogger.info(
     `HandlePackage 获取手机号，4G地址 0x${msg.strAddr4G}`
   );
+
+  // global.foxLogic.renderBridge.Send(CMD.CSGetPhoneNumber, msg);
 });
+
 HandleMap.set(CMD.CSSendStatisticaData, (sessionId, data) => {
   let msg = new Packages.CSSendStatisticaData(data);
   global.packageLogger.info(
     `HandlePackage 统计数据，4G地址 0x${msg.strAddr4G}`
   );
+
+  // global.foxLogic.renderBridge.Send(CMD.CSSendStatisticaData, msg);
 });
+
 HandleMap.set(CMD.CSSetMsgContent, (sessionId, data) => {
   let msg = new Packages.CSSetMsgContent(data);
   global.packageLogger.info(
     `HandlePackage 设置短信内容，4G地址 0x${msg.strAddr4G}`
   );
+
+
 });
+
 HandleMap.set(CMD.CSGetMsgContent, (sessionId, data) => {
   let msg = new Packages.CSGetMsgContent(data);
   global.packageLogger.info(
@@ -110,6 +128,7 @@ HandleMap.set(CMD.CSGetDeviceAveData, (sessionId, data) => {
     )} 设备类型: 0x${msg.deviceType.toString(16)}`
   );
 });
+
 HandleMap.set(CMD.CSReportDeviceAddr, (sessionId, data) => {
   let msg = new Packages.CSReportDeviceAddr(data);
   global.packageLogger.info(
@@ -120,7 +139,9 @@ HandleMap.set(CMD.CSReportDeviceAddr, (sessionId, data) => {
       `设备: 0x${key.toString(16)} 类型: 0x${value.toString(16)}`
     );
   });
+  global.foxLogic.connMgr.OnConnectorReportedDevices(sessionId, msg.deviceMap);
 });
+
 HandleMap.set(CMD.CSGetDeviceCurrentData, (sessionId, data) => {
   let msg = new Packages.CSSetDeviceCurrentTime(data);
   global.packageLogger.info(

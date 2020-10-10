@@ -1,14 +1,13 @@
 import foxcoreMjs from "../foxcore/foxcore.mjs";
 
 class Connector {
-  construct(sessionId) {
+  construct(sessionId, strAddr4G) {
     this.sessionId = sessionId;
+    this.strAddr4G = strAddr4G
   }
 
-  Init(addr, devicesAddrArray) {
-    this.addr = addr;
-    this.devicesAddrArray = devicesAddrArray;
-    this.hexAddrStr = `0x${this.addr.toString(16)}`;
+  InitDevices(deviceMap){
+    this.deviceMap = deviceMap;
   }
 }
 
@@ -18,17 +17,28 @@ class ConnectorManager {
     this.connectorMap = new Map();
   }
 
-  OnConnectorOnline(sessionId, addr) {}
-
-  OnConnectorReportedDevices(sessionId, devicesMap) {}
-
-  AddConnector(sessionId, addr, devicesAddrArray) {
+  OnConnectorOnline(sessionId, strAddr4G) {
     let connector = this.connectorMap.get(sessionId);
-    if (connector == undefined) {
-      connector = new Connector(sessionId);
+    if(connector == undefined){
+      connector = new Connector(sessionId, strAddr4G);
+    }else{
+      if (connector.strAddr4G != strAddr4G){
+        global.netLogger.warning(`同一个Socket连接，更新4G地址，0x${connector.strAddr4G} -> 0x${strAddr4G}`);
+        connector.strAddr4G = strAddr4G;
+      }
     }
-    connector.Init(addr, devicesAddrArray);
 
+    // todo: send event refresh view
+  }
+
+  OnConnectorReportedDevices(sessionId, devicesMap) {
+    let connector = this.GetConnector(sessionId);
+    if (connector != undefined){
+      connector.InitDevices(deviceMap);
+    }
+    else{
+      global.netLogger.error("获取4G设备失败，无法保存从机地址数据, sessionId: ", sessionId);
+    }
     // todo: send event refresh view
   }
 
